@@ -76,7 +76,7 @@ async def test_single_step (contract_factory):
         print(f'  test #{i+1} passed.')
 
     print(f'> {TEST_COUNT} tests passed.')
-    print(f'> Resource usage of the last test: {ret.call_info.cairo_usage}')
+    print(f'> Resource usage of the last test: {ret.call_info.execution_resources}')
     print()
 
 
@@ -199,7 +199,7 @@ async def test_collision_and_single_step (contract_factory):
         print(f'  test #{i+1} passed; collided={c1c2_has_collided}')
 
     print(f'> {TEST_COUNT} tests passed.')
-    print(f'> Resource usage of the last test: {ret.call_info.cairo_usage}')
+    print(f'> Resource usage of the last test: {ret.call_info.execution_resources}')
     print()
 
 
@@ -259,6 +259,6 @@ async def test_friction_single_circle (contract_factory):
         print(f'  test #{i+1} passed.')
 
     print(f'> {TEST_COUNT} tests passed.')
-    print(f'> Resource usage of the last test: {ret.call_info.cairo_usage}')
+    print(f'> Resource usage of the last test: {ret.call_info.execution_resources}')
     print()
 

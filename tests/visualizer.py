@@ -5,6 +5,8 @@ import time
 import json
 from math import sqrt
 from timeit import default_timer as timer
+import os
+#os.environ['SDL_VIDEODRIVER']='x11'
 
 def print_system_state(state):
     print_ball_state(state['s1'])

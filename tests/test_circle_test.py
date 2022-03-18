@@ -30,5 +30,5 @@ async def test_circle_test ():
             print(f'  completed {i+1}/{TEST_COUNT} ...')
 
     print(f'> {TEST_COUNT} tests passed.')
-    print(f'> Resource usage of the last test: {ret.call_info.cairo_usage}')
+    print(f'> Resource usage of the last test: {ret.call_info.execution_resources}')
     print()

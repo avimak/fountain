@@ -47,7 +47,7 @@ async def test_game ():
         print(f'solution_id = {ret.result.solution_id}')
         print(f'solution_family = {ret.result.solution_family}')
         print(f'score = {ret.result.score}')
-        print(f'n_steps: {ret.call_info.cairo_usage.n_steps}')
+        print(f'n_steps: {ret.call_info.execution_resources.n_steps}')
 
         events = ret.main_call_events
         if len(events)>0:

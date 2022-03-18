@@ -96,7 +96,7 @@ async def test_game_state_forwarder ():
         # print(f'arr_obj_final: {ret.result.arr_obj_final}')
         print(f'arr_collision_record: {ret.result.arr_collision_record}')
         collision_records += ret.result.arr_collision_record
-        print(f'n_steps: {ret.call_info.cairo_usage.n_steps}')
+        print(f'n_steps: {ret.call_info.execution_resources.n_steps}')
 
         events = ret.main_call_events
         if len(events)>0:
