@@ -3,7 +3,7 @@
 from starkware.cairo.common.cairo_builtins import HashBuiltin
 from starkware.cairo.common.math import (unsigned_div_rem, assert_le, abs_value, split_felt)
 from starkware.cairo.common.alloc import alloc
-from starkware.starknet.common.syscalls import get_caller_address
+from starkware.starknet.common.syscalls import (get_caller_address, get_block_number)
 
 from contracts.constants import (FP)
 from contracts.structs import (Vec2, ObjectState, LevelState)
@@ -35,6 +35,7 @@ struct SolutionRecord:
     member level : felt
     member solution_family : felt
     member score : felt
+    member block_number : felt
 end
 
 
@@ -63,6 +64,36 @@ func view_solution_record_by_id {syscall_ptr : felt*, pedersen_ptr : HashBuiltin
     return (solution_record)
 end
 
+
+@view
+func view_solution_records {syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr} (
+    ) -> (records_len : felt, records : SolutionRecord*):
+    alloc_locals
+    
+    let (records : SolutionRecord*) = alloc()
+    let (count) = solution_found_count.read ()
+    _recurse_view_solution_records (count, records, 0)
+    
+    return (count, records)
+end
+
+
+func _recurse_view_solution_records {syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr} (
+        len : felt,
+        arr : SolutionRecord*,
+        idx : felt
+    ) -> ():
+    
+    if idx == len:
+        return ()
+    end
+    
+    let (record : SolutionRecord) = solution_record_by_id.read (idx)
+    assert arr[idx] = record
+    
+    _recurse_view_solution_records (len, arr, idx+1)
+    return()
+end
 
 @view
 func view_solution_records_as_html {syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr} (
@@ -293,6 +324,7 @@ func submit_move_for_level {syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, ra
     #
     if is_solution_family_new * is_solution == 1:
         let (caller_address) = get_caller_address()
+        let (block_number) = get_block_number()
         solution_found_count.write (count + 1)
         solution_record_by_id.write (
             count,
@@ -300,7 +332,8 @@ func submit_move_for_level {syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, ra
                 discovered_by = caller_address,
                 level = level,
                 solution_family = this_family,
-                score = score
+                score = score,
+                block_number = block_number
             )
         )
         tempvar syscall_ptr = syscall_ptr
