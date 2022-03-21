@@ -291,7 +291,10 @@ func submit_move_for_level {syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, ra
     #
     # revert this transaction if solution won't go to scoreboard - helps with frontend updates
     #
-    assert_not_zero (is_solution_family_new * is_solution)
+    with_attr error_message("`is_solution_family_new * is_solution` should not be zero"):
+        assert_not_zero (is_solution_family_new * is_solution)
+    end
+    
     
     #
     # if not reverted - houston we have a solution 
