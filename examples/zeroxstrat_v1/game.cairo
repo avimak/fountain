@@ -1,7 +1,7 @@
 %lang starknet
 
 from starkware.cairo.common.cairo_builtins import HashBuiltin
-from starkware.cairo.common.math import (unsigned_div_rem, assert_le, abs_value, split_felt)
+from starkware.cairo.common.math import (unsigned_div_rem, assert_le, abs_value, split_felt, assert_not_zero)
 from starkware.cairo.common.alloc import alloc
 from starkware.starknet.common.syscalls import get_caller_address
 
@@ -287,30 +287,26 @@ func submit_move_for_level {syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, ra
         len = count,
         idx = 0
     )
-
+    
     #
-    # update record if new solution family is found
+    # revert this transaction if solution won't go to scoreboard - helps with frontend updates
     #
-    if is_solution_family_new * is_solution == 1:
-        let (caller_address) = get_caller_address()
-        solution_found_count.write (count + 1)
-        solution_record_by_id.write (
-            count,
-            SolutionRecord(
-                discovered_by = caller_address,
-                level = level,
-                solution_family = this_family,
-                score = score
-            )
+    assert_not_zero (is_solution_family_new * is_solution)
+    
+    #
+    # if not reverted - houston we have a solution 
+    #
+    let (caller_address) = get_caller_address()
+    solution_found_count.write (count + 1)
+    solution_record_by_id.write (
+        count,
+        SolutionRecord(
+            discovered_by = caller_address,
+            level = level,
+            solution_family = this_family,
+            score = score
         )
-        tempvar syscall_ptr = syscall_ptr
-        tempvar pedersen_ptr = pedersen_ptr
-        tempvar range_check_ptr = range_check_ptr
-    else:
-        tempvar syscall_ptr = syscall_ptr
-        tempvar pedersen_ptr = pedersen_ptr
-        tempvar range_check_ptr = range_check_ptr
-    end
+    )
 
 
     return (
