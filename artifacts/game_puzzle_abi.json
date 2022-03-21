@@ -86,10 +86,15 @@
                 "name": "score",
                 "offset": 3,
                 "type": "felt"
+            },
+            {
+                "name": "block_number",
+                "offset": 4,
+                "type": "felt"
             }
         ],
         "name": "SolutionRecord",
-        "size": 4,
+        "size": 5,
         "type": "struct"
     },
     {
@@ -152,6 +157,22 @@
             {
                 "name": "solution_record",
                 "type": "SolutionRecord"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "view_solution_records",
+        "outputs": [
+            {
+                "name": "records_len",
+                "type": "felt"
+            },
+            {
+                "name": "records",
+                "type": "SolutionRecord*"
             }
         ],
         "stateMutability": "view",
