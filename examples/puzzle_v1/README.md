@@ -9,7 +9,7 @@ The puzzle is based on the original concept of [Solve 2 Mint](https://mirror.xyz
 Read through all the instructions, solve the puzzle, join the Discord, and level up your Cairo!<br>
 
 [Frontend for SNS](https://solve2mint-sns.netlify.app/) <br>
-[Frontend for Puzzle]() -- Coming Soon
+[Frontend for Puzzle](https://solve2mint.netlify.app/) <br>
 
 ## Instructions
 - Read through the game.cairo, levels.cairo, and additional contracts
@@ -28,6 +28,6 @@ Read through all the instructions, solve the puzzle, join the Discord, and level
 
 ## Contract Addresses on Goerli (Testnet)
 
-- game.cairo : 0x0195566fc35e9b48a813d5dba08339f12906cf2b6d01a589907f10500b94ecf3
+- game.cairo: 0x039a8e74825d60addee8af5dbdbb6173e54b91942920208e0c14097b4e2eeefd
 - SNS: 0x02ef8e28b8d7fc96349c76a0607def71c678975dbd60508b9c343458c4758fac
 
