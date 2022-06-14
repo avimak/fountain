@@ -352,6 +352,145 @@ func submit_move_for_level {syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, ra
     )
 end
 
+#
+# Henri's fancy debugging function
+#
+@external
+func test_move_for_level {syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr} (
+        level : felt,
+        move_x : felt,
+        move_y : felt
+    ) -> (
+        is_solution : felt,
+        is_solution_family_new : felt,
+        solution_id : felt,
+        solution_family : felt,
+        score : felt,
+        arr_collision_record_len : felt,
+        arr_collision_record : felt*
+    ):
+    alloc_locals
+
+    let move = Vec2(move_x, move_y)
+
+    #
+    # Check if the move is legal (within velocity constraints)
+    #
+    assert_legal_velocity (move)
+
+
+    #
+    # Pull level from inventory
+    #
+    let (level_state : LevelState) = pull_level (level)
+
+
+    #
+    # Assemble initial scene state and parameters
+    #
+    let arr_obj_len = 4
+    let (arr_obj : ObjectState*) = alloc()
+
+    assert arr_obj[0] = ObjectState(
+        pos = level_state.score0_ball,
+        vel = Vec2(0,0),
+        acc = Vec2(0,0)
+    )
+
+    assert arr_obj[1] = ObjectState(
+        pos = level_state.score1_ball,
+        vel = Vec2(0,0),
+        acc = Vec2(0,0)
+    )
+
+    assert arr_obj[2] = ObjectState(
+        pos = level_state.forbid_ball,
+        vel = Vec2(0,0),
+        acc = Vec2(0,0)
+    )
+
+    assert arr_obj[3] = ObjectState(
+        pos = level_state.player_ball,
+        vel = move,
+        acc = Vec2(0,0)
+    )
+
+    let cap = 40
+    let dt = 150000000000 # 0.15 * FP
+
+    let params_len = 7
+    let (params) = alloc()
+    assert params[0] = 20 *FP  # radius
+    assert params[1] = (20+20)**2 *FP # square of double radius
+    assert params[2] = 0       # xmin
+    assert params[3] = 250 *FP # xmax
+    assert params[4] = 0       # ymin
+    assert params[5] = 250 *FP # ymax
+    assert params[6] = 40 *FP  # frictional acceleration
+
+
+    #
+    # Run simlulation
+    #
+    let (
+        arr_obj_final_len : felt,
+        arr_obj_final : ObjectState*,
+        arr_collision_record_len : felt,
+        arr_collision_record : felt*
+    ) = forward_scene_capped_counting_collision (
+        arr_obj_len,
+        arr_obj,
+        cap,
+        dt,
+        params_len,
+        params
+    )
+
+
+    # Debug: revert if scene is not at rest after one transaction
+    # (if requiring multi-tx -- may need a ticker mechanism to resolve e.g. yagi)
+
+
+    #
+    # Check if is_solution: score non_zero at the end
+    #
+    let (score) = _calculate_score_from_record {} (
+        arr_collision_record_len,
+        arr_collision_record
+    )
+
+    local is_solution
+    if score != 0:
+        assert is_solution = 1
+    else:
+        assert is_solution = 0
+    end
+
+
+    #
+    # Obtain family number and check for originality;
+    # naively using O(n) storage array traversal to check for value collision
+    # TODO: use merkle tree is n is large
+    #
+    let (this_family) = _serialize_collision_record_to_family (arr_collision_record_len, arr_collision_record)
+
+    let (count) = solution_found_count.read ()
+    let (is_solution_family_new) = _recurse_check_for_family_collision (
+        level = level,
+        target = this_family,
+        len = count,
+        idx = 0
+    )
+    return (
+        is_solution,
+        is_solution_family_new,
+        count,
+        this_family,
+        score,
+        arr_collision_record_len,
+        arr_collision_record
+    )
+end
 
 func _recurse_check_for_family_collision {syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr} (
         level : felt,

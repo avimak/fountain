@@ -1,0 +1,24 @@
+Number of 0s in S2M UX
+000000000000
+
+const FP = 10 ** 12
+
+tempvar v_sq = velocity.x * velocity.x + velocity.y * velocity.y
+
+    with_attr error_message("Illegla initial velocity: magnitude out of bound."):
+        assert_le (v_sq, 2*150*FP*150*FP)
+
+
+starknet call --network alpha-goerli --address 0x039a8e74825d60addee8af5dbdbb6173e54b91942920208e0c14097b4e2eeefd --abi s2m-abi.json --function submit_move_for_level --inputs 1 23000000000000 24000000000000
+
+
+starknet deploy --contract s2m.json --gateway_url http://127.0.0.1:5050/  --feeder_gateway_url http://127.0.0.1:5050/ 
+
+
+starknet call --gateway_url http://127.0.0.1:5050/  --feeder_gateway_url http://127.0.0.1:5050/ --address 0x06d7509dd4835a4bf72fda4fc6efdbeb67df405ac02d3a13462e0af425dbc9df --abi s2m-abi.json --function test_move_for_level --inputs 1 3618502788666131213697322783095070105623107215331596699973092056135872020480 3618502788666131213697322783095070105623107215331596699973092056135872020414
+
+
+starknet call --network alpha-goerli --address 0x039a8e74825d60addee8af5dbdbb6173e54b91942920208e0c14097b4e2eeefd --abi s2m-abi.json --function submit_move_for_level --inputs 0 10000000000000 210000000000000
+
+0x039a8e74825d60addee8af5dbdbb6173e54b91942920208e0c14097b4e2eeefd
+0x0711C236BC76E4AF8CA25D6C6306F4A14D0F964E457E83E74818A197E1E28577
